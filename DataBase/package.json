@@ -1,0 +1,23 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "description": "DataBase for Library_B18030316",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "json-server --watch --port 3001 database.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/applenjr/B18030316_Library.git"
+  },
+  "author": "B18030316包宇豪",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/applenjr/B18030316_Library/issues"
+  },
+  "homepage": "https://github.com/applenjr/B18030316_Library#readme",
+  "dependencies": {
+    "json-server": "^0.17.0"
+  }
+}

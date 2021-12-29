@@ -1,0 +1,72 @@
+{
+  "Sign": [
+    {
+      "id": "1",
+      "username": "Tutu",
+      "authorize": "system",
+      "name": "涂鑫曼",
+      "number": "B18030309",
+      "tel": "19805182522",
+      "email": "123456789@qq.com",
+      "deadline": "2022-06-26"
+    },
+    {
+      "id": "2",
+      "username": "Baobao",
+      "authorize": "book",
+      "name": "包宇豪",
+      "number": "B18030316",
+      "tel": "19805188700",
+      "email": "1722974163@qq.com",
+      "deadline": "2022-06-28"
+    },
+    {
+      "id": "3",
+      "username": "SLTAL",
+      "authorize": "reader",
+      "name": "石磊",
+      "number": "B18030315",
+      "tel": "19805189387",
+      "email": "1347283648@qq.com",
+      "deadline": "2022-06-29"
+    }
+  ],
+  "Signed": [
+    {
+      "id": "1",
+      "username": "Tutu",
+      "authorize": "system",
+      "name": "涂鑫曼",
+      "number": "B18030309",
+      "tel": "19805182522",
+      "email": "123456789@qq.com",
+      "deadline": "2022-06-26"
+    }
+  ],
+  "Library": [
+    {
+      "id": "5",
+      "name": "哈利波特",
+      "author": "J.K.罗琳",
+      "PublishHouse": "人民邮电出版社",
+      "PublishDate": "2021-12-21",
+      "Isbn": "123456"
+    },
+    {
+      "id": "6",
+      "name": "Tutu",
+      "author": "J.K.罗琳",
+      "PublishHouse": "人民邮电出版社",
+      "PublishDate": "2021-12-26",
+      "Isbn": "43532"
+    },
+    {
+      "id": "7",
+      "name": "Baobao",
+      "author": "J.K.罗琳",
+      "PublishHouse": "人民邮电出版社",
+      "PublishDate": "2021-12-25",
+      "Isbn": "3423423"
+    }
+  ]
+}
