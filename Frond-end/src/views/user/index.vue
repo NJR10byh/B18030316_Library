@@ -56,6 +56,12 @@
                 <span>{{ userinfo.deadline }}</span>
               </div>
             </div>
+            <div
+              class="part1_1 part1_2 Manage"
+              v-if="userinfo.authorize == '系统管理员'"
+            >
+              <div class="Info_Menu">管理用户</div>
+            </div>
           </div>
         </div>
       </div>
@@ -112,7 +118,7 @@ export default {
     return {
       // 当前用户数据
       userinfo: {
-        id: "",
+        id: 0,
         username: "",
         authorize: "",
         name: "",
@@ -124,7 +130,6 @@ export default {
 
       putid: "",
       willput: {
-        id: "",
         username: "",
         authorize: "",
         name: "",
@@ -146,17 +151,20 @@ export default {
       let that = this;
       that.tableData = [];
       that.total = 0;
+      await that.request("Signed", {}, "GET", {}).then((res) => {
+        that.userinfo.id = res.data[0].id;
+      });
+      let url = "Sign/" + that.userinfo.id;
       await that
-        .request("Signed", {}, "GET", {})
+        .request(url, {}, "GET", {})
         .then((res) => {
-          that.userinfo.id = res.data[0].id;
-          that.userinfo.username = res.data[0].username;
-          that.userinfo.name = res.data[0].name;
-          that.userinfo.number = res.data[0].number;
-          that.userinfo.tel = res.data[0].tel;
-          that.userinfo.email = res.data[0].email;
-          that.userinfo.deadline = res.data[0].deadline;
-          switch (res.data[0].authorize) {
+          that.userinfo.username = res.data.username;
+          that.userinfo.name = res.data.name;
+          that.userinfo.number = res.data.number;
+          that.userinfo.tel = res.data.tel;
+          that.userinfo.email = res.data.email;
+          that.userinfo.deadline = res.data.deadline;
+          switch (res.data.authorize) {
             case "system":
               that.userinfo.authorize = "系统管理员";
               break;
@@ -196,10 +204,9 @@ export default {
     // 修改用户信息
     async AlertConfirm() {
       let that = this;
-      that.willput.id = that.userinfo.id;
       that.willput.authorize = that.userinfo.authorize;
       that.willput.deadline = that.userinfo.deadline;
-      let url = "Signed/" + that.userinfo.id;
+      let url = "Sign/" + that.userinfo.id;
       await that.request(url, that.willput, "PUT", {});
       that.AlertdialogVisible = false;
       that.refresh();
@@ -241,7 +248,7 @@ export default {
       .authorize {
         font-size: 18px;
         color: #999;
-        margin-top: 2px;
+        margin-top: 5px;
       }
     }
   }
@@ -335,6 +342,12 @@ export default {
           .part1_2 {
             margin-left: 50px;
           }
+          .Manage {
+            background: #409eff;
+            border: 0;
+            color: #fff;
+            cursor: pointer;
+          }
         }
       }
     }
@@ -345,7 +358,6 @@ export default {
       span {
         font-size: 17px;
         font-weight: bold;
-        // color: #304156;
       }
     }
   }

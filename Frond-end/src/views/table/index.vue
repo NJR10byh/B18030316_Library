@@ -38,7 +38,12 @@
       <el-table-column prop="PublishHouse" label="出版社" />
       <el-table-column prop="PublishDate" label="出版日期" />
       <el-table-column prop="Isbn" label="ISBN（书号）" />
-      <el-table-column prop="setting" label="操作" width="180" v-if="">
+      <el-table-column
+        prop="setting"
+        label="操作"
+        width="180"
+        v-if="authorize == 'book'"
+      >
         <template slot-scope="scope">
           <el-button
             @click="handleEdit(scope.$index, scope.row)"
@@ -125,6 +130,7 @@
 export default {
   data() {
     return {
+      userid: "",
       // 当前用户权限
       authorize: "",
 
@@ -184,6 +190,13 @@ export default {
       that.total = 0;
       that.Select = "";
       that.SearchText = "";
+      await that.request("Signed", {}, "GET", {}).then((res) => {
+        that.userid = res.data[0].id;
+      });
+      let url = "Sign/" + that.userid;
+      await that.request(url, {}, "GET", {}).then((res) => {
+        this.authorize = res.data.authorize;
+      });
       await that
         .request("Library", {}, "GET", {})
         .then((res) => {

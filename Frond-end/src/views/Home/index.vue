@@ -2,7 +2,7 @@
   <div class="Box">
     <div class="userinfo">
       <div class="user">
-        Welcome，<span>{{ user }}</span>
+        Welcome，<span>{{ username }}</span>
       </div>
       <!-- <div class="authorize">权限：系统管理员</div> -->
     </div>
@@ -13,7 +13,8 @@
 export default {
   data() {
     return {
-      user: "",
+      userid: 0,
+      username: "",
     };
   },
   created() {
@@ -23,7 +24,12 @@ export default {
     async getuesrinfo() {
       let that = this;
       await that.request("Signed", {}, "GET", {}).then((res) => {
-        that.user = res.data[0].username;
+        that.userid = res.data[0].id;
+      });
+      let url = "Sign/" + that.userid;
+      await that.request(url, {}, "GET", {}).then((res) => {
+        console.log(res.data);
+        that.username = res.data.username;
       });
     },
   },

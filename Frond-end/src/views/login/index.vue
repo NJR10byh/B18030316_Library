@@ -22,6 +22,7 @@
           type="text"
           tabindex="1"
           auto-complete="on"
+          class="Sign_input"
         />
       </el-form-item>
 
@@ -36,6 +37,7 @@
           name="password"
           tabindex="2"
           auto-complete="on"
+          class="Sign_input"
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd"
@@ -52,14 +54,58 @@
           font-size: 20px;
           font-weight: bold;
           letter-spacing: 1px;
-          <!-- border: 1px solid red; -->
         "
         @click="handleLogin"
       >
         登录
       </el-button>
     </el-form>
-    <div class="register">还没账号？注册一个</div>
+    <div class="register" @click="RegisterDialog = true">
+      还没账号？注册一个
+    </div>
+    <el-dialog
+      class="RegisterDialog"
+      title="用户注册"
+      :visible.sync="RegisterDialog"
+      width="35%"
+    >
+      <div>
+        <span>用户名：</span
+        ><el-input
+          v-model="willput.username"
+          placeholder="请输入用户名"
+        ></el-input>
+      </div>
+      <div>
+        <span>姓名：</span
+        ><el-input v-model="willput.name" placeholder="请输入姓名"></el-input>
+      </div>
+      <div>
+        <span>工号 / 学号：</span
+        ><el-input
+          v-model="willput.number"
+          placeholder="请输入工号 / 学号"
+        ></el-input>
+      </div>
+      <div>
+        <span>联系方式：</span
+        ><el-input
+          v-model="willput.tel"
+          placeholder="请输入联系方式"
+        ></el-input>
+      </div>
+      <div>
+        <span>电子邮件：</span
+        ><el-input
+          v-model="willput.email"
+          placeholder="请输入电子邮件"
+        ></el-input>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="RegisterDialog = false">取 消</el-button>
+        <el-button type="primary" @click="RegisterConfirm()">注 册</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -105,6 +151,19 @@ export default {
       loading: false,
       passwordType: "password",
       redirect: undefined,
+
+      // 注册信息
+      RegisterDialog: false,
+      willput: {
+        id: "",
+        username: "",
+        authorize: "",
+        name: "",
+        number: "",
+        tel: "",
+        email: "",
+        deadline: "",
+      },
     };
   },
   methods: {
@@ -118,11 +177,11 @@ export default {
         this.$refs.password.focus();
       });
     },
-    handleLogin() {
+    async handleLogin() {
       if (this.loginForm.userName != "" && this.loginForm.passWord != "") {
         const that = this;
         let url = "Sign?username=" + this.loginForm.userName;
-        that
+        await that
           .request(url, "", "GET", {})
           .then((res) => {
             if (res.data == "") {
@@ -137,13 +196,6 @@ export default {
               });
               let obj = {
                 id: res.data[0].id,
-                username: res.data[0].username,
-                authorize: res.data[0].authorize,
-                name: res.data[0].name,
-                number: res.data[0].number,
-                tel: res.data[0].tel,
-                email: res.data[0].email,
-                deadline: res.data[0].deadline,
               };
               that.request("Signed", obj, "POST");
               this.$router.push({
@@ -169,14 +221,26 @@ export default {
         });
       }
     },
+    async RegisterConfirm() {
+      let that = this;
+      await that.request("Registe", that.willput, "POST");
+      this.$message({
+        message: "注册成功！请等候管理员审核",
+        type: "success",
+      });
+      that.RegisterDialog = false;
+      that.willput.username = "";
+      that.willput.authorize = "";
+      that.willput.name = "";
+      that.willput.number = "";
+      that.willput.tel = "";
+      that.willput.email = "";
+    },
   },
 };
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
 $bg: #283443;
 $light_gray: #fff;
 $cursor: #fff;
@@ -193,25 +257,27 @@ $cursor: #fff;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  .el-input {
-    display: inline-block;
-    height: 50px;
-    width: 85%;
-    font-size: 16px;
-
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      border-radius: 0px;
-      // padding: 12px 5px 12px 15px;
-      color: $light_gray;
+  .login-form {
+    .el-input {
+      display: inline-block;
       height: 50px;
-      caret-color: $cursor;
+      width: 85%;
+      font-size: 16px;
 
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
+      input {
+        background: transparent;
+        border: 0px;
+        -webkit-appearance: none;
+        border-radius: 0px;
+        // padding: 12px 5px 12px 15px;
+        color: $light_gray;
+        height: 50px;
+        caret-color: $cursor;
+
+        &:-webkit-autofill {
+          box-shadow: 0 0 0px 1000px $bg inset !important;
+          -webkit-text-fill-color: $cursor !important;
+        }
       }
     }
   }
@@ -221,6 +287,26 @@ $cursor: #fff;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     color: #454545;
+  }
+
+  .register {
+    cursor: pointer;
+    color: #000;
+  }
+  .RegisterDialog {
+    div {
+      margin-top: 8px;
+      span {
+        font-size: 17px;
+        font-weight: bold;
+      }
+      // color: $bg;
+      .el-input {
+        input {
+          color: #000;
+        }
+      }
+    }
   }
 }
 </style>
