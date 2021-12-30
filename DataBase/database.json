@@ -6,8 +6,8 @@
       "authorize": "",
       "name": "王程远",
       "number": "B18030314",
-      "tel": "19805180000",
-      "email": "234563345@qq.com",
+      "tel": "15768678678",
+      "email": "245234214@qq.com",
       "deadline": ""
     }
   ],
@@ -33,17 +33,21 @@
       "deadline": "2022-06-28"
     },
     {
-      "id": 3,
       "username": "SLTAL",
       "authorize": "reader",
       "name": "石磊",
       "number": "B18030315",
       "tel": "19805189387",
       "email": "1347283648@qq.com",
-      "deadline": "2022-06-29"
+      "deadline": "2022-06-29",
+      "id": 3
     }
   ],
-  "Signed": [],
+  "Signed": [
+    {
+      "id": 1
+    }
+  ],
   "Library": [
     {
       "id": 5,
