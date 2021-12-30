@@ -18,8 +18,25 @@
         ></el-input>
         <el-button icon="el-icon-search" @click="search">搜索</el-button>
       </div>
-      <div class="refresh">
-        <el-button icon="el-icon-refresh" @click="refresh">刷新 </el-button>
+      <div class="newin_refresh">
+        <div class="refresh up" v-if="authorize == 'book'">
+          <el-button icon="el-icon-top" @click="Borrow_Up()"
+            >最后借阅时间（升序）
+          </el-button>
+        </div>
+        <div class="refresh down" v-if="authorize == 'book'">
+          <el-button icon="el-icon-bottom" @click="Borrow_Down()"
+            >最后借阅时间（降序）
+          </el-button>
+        </div>
+        <div class="refresh newin" v-if="authorize == 'book'">
+          <el-button icon="el-icon-collection" @click="NewInKu()"
+            >最近入库（12月）
+          </el-button>
+        </div>
+        <div class="refresh">
+          <el-button icon="el-icon-refresh" @click="refresh">刷新 </el-button>
+        </div>
       </div>
     </div>
     <!-- table -->
@@ -38,6 +55,8 @@
       <el-table-column prop="PublishHouse" label="出版社" />
       <el-table-column prop="PublishDate" label="出版日期" />
       <el-table-column prop="Isbn" label="ISBN（书号）" />
+      <el-table-column prop="InDate" label="入库日期" />
+      <el-table-column prop="LastBorrowDate" label="最后借阅日期" />
       <el-table-column
         prop="setting"
         label="操作"
@@ -54,6 +73,27 @@
             @click="handleDelete(scope.$index, scope.row)"
             icon="el-icon-delete"
             >删除</el-button
+          >
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="setting"
+        label="操作"
+        width="180"
+        v-if="authorize == 'reader'"
+      >
+        <template slot-scope="scope">
+          <el-button
+            @click="Ding(scope.$index, scope.row)"
+            icon="el-icon-notebook-2"
+            :disabled="!scope.row.Ifborrow"
+            >预定</el-button
+          >
+          <el-button
+            @click="Jie(scope.$index, scope.row)"
+            icon="el-icon-reading"
+            :disabled="scope.row.Ifborrow"
+            >借阅</el-button
           >
         </template>
       </el-table-column>
@@ -123,6 +163,27 @@
         <el-button type="primary" @click="DeleteConfirm()">删 除</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      class="handledialog"
+      title="最近入库（12月入库）"
+      :visible.sync="HandleDialog"
+      width="60%"
+    >
+      <el-table :data="NewIn">
+        <el-table-column prop="name" label="书籍名称" />
+        <el-table-column prop="author" label="作者" />
+        <el-table-column prop="PublishHouse" label="出版社" />
+        <el-table-column prop="PublishDate" label="出版日期" />
+        <el-table-column prop="Isbn" label="ISBN（书号）" />
+        <el-table-column prop="InDate" label="入库日期" />
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="HandleDialog = false">取 消</el-button>
+        <el-button type="primary" @click="HandleDialog = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -144,7 +205,7 @@ export default {
       options: [
         {
           value: "name",
-          label: "书名",
+          label: "书籍名称",
         },
         {
           value: "author",
@@ -173,10 +234,17 @@ export default {
         PublishHouse: "",
         PublishDate: "",
         Isbn: "",
+        Ifborrow: "",
+        InDate: "",
+        LastBorrowDate: "",
       },
 
       PutdialogVisible: false,
       DeletedialogVisible: false,
+
+      // 最近入库
+      HandleDialog: false,
+      NewIn: [],
     };
   },
   created() {
@@ -210,6 +278,9 @@ export default {
             obj.PublishHouse = res.data[i].PublishHouse;
             obj.PublishDate = res.data[i].PublishDate;
             obj.Isbn = res.data[i].Isbn;
+            obj.Ifborrow = res.data[i].Ifborrow;
+            obj.InDate = res.data[i].InDate;
+            obj.LastBorrowDate = res.data[i].LastBorrowDate;
             that.tableData.push(obj);
           }
           this.$message({
@@ -243,6 +314,9 @@ export default {
             obj.PublishHouse = res.data[i].PublishHouse;
             obj.PublishDate = res.data[i].PublishDate;
             obj.Isbn = res.data[i].Isbn;
+            obj.Ifborrow = res.data[i].Ifborrow;
+            obj.InDate = res.data[i].InDate;
+            obj.LastBorrowDate = res.data[i].LastBorrowDate;
             that.tableData.push(obj);
           }
           this.$message({
@@ -263,7 +337,7 @@ export default {
     async search() {
       let that = this;
       that.tableData = [];
-      let url = "Library?" + that.Select + "=" + that.SearchText;
+      let url = "Library?" + that.Select + "_like=" + that.SearchText;
       await that
         .request(url, {}, "GET", {})
         .then((res) => {
@@ -277,6 +351,9 @@ export default {
             obj.PublishHouse = res.data[i].PublishHouse;
             obj.PublishDate = res.data[i].PublishDate;
             obj.Isbn = res.data[i].Isbn;
+            obj.Ifborrow = res.data[i].Ifborrow;
+            obj.InDate = res.data[i].InDate;
+            obj.LastBorrowDate = res.data[i].LastBorrowDate;
             that.tableData.push(obj);
           }
           this.$message({
@@ -297,22 +374,27 @@ export default {
       let that = this;
       that.PutdialogVisible = true;
       that.putid = row.id;
-      that.willput.id = row.id;
       that.willput.name = row.name;
       that.willput.author = row.author;
       that.willput.PublishHouse = row.PublishHouse;
       that.willput.PublishDate = row.PublishDate;
       that.willput.Isbn = row.Isbn;
+      that.willput.Ifborrow = row.Ifborrow;
+      that.willput.InDate = row.InDate;
+      that.willput.LastBorrowDate = row.LastBorrowDate;
     },
 
     // 修改书籍
     async PutConfirm() {
       let that = this;
-      that.willput.id = that.putid;
       let url = "Library/" + that.putid;
-      await that.request(url, that.willput, "PUT", {});
-      this.PutdialogVisible = false;
-      that.refresh();
+      await that
+        .request(url, that.willput, "PUT", {})
+        .then(() => {
+          this.PutdialogVisible = false;
+          that.refresh();
+        })
+        .catch(() => {});
     },
 
     // 删除书籍
@@ -327,9 +409,172 @@ export default {
       that.tableData = [];
       that.total = 0;
       let url = "Library/" + that.deleteid;
-      await that.request(url, {}, "DELETE", {});
-      this.DeletedialogVisible = false;
-      that.refresh();
+      await that
+        .request(url, {}, "DELETE", {})
+        .then(() => {
+          this.DeletedialogVisible = false;
+          that.refresh();
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败",
+            type: "error",
+          });
+        });
+    },
+
+    // 预定
+    async Ding(index, row) {
+      let that = this;
+      let ding = {};
+      ding.name = row.name;
+      ding.author = row.author;
+      ding.PublishHouse = row.PublishHouse;
+      ding.PublishDate = row.PublishDate;
+      ding.Isbn = row.Isbn;
+      ding.Ifborrow = !row.Ifborrow;
+      ding.InDate = row.InDate;
+      ding.LastBorrowDate = row.LastBorrowDate;
+      let url = "Library/" + row.id;
+      await that
+        .request(url, ding, "PUT", {})
+        .then(() => {
+          this.$message({
+            message: "预定成功",
+            type: "success",
+          });
+          that.refresh();
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败，预定失败",
+            type: "error",
+          });
+        });
+    },
+    // 借阅
+    async Jie(index, row) {
+      let that = this;
+      let jie = {};
+      jie.name = row.name;
+      jie.author = row.author;
+      jie.PublishHouse = row.PublishHouse;
+      jie.PublishDate = row.PublishDate;
+      jie.Isbn = row.Isbn;
+      jie.Ifborrow = !row.Ifborrow;
+      jie.InDate = row.InDate;
+      jie.LastBorrowDate = row.LastBorrowDate;
+      let url = "Library/" + row.id;
+      await that
+        .request(url, jie, "PUT", {})
+        .then(() => {
+          this.$message({
+            message: "借阅成功",
+            type: "success",
+          });
+          that.refresh();
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败，借阅失败",
+            type: "error",
+          });
+        });
+    },
+
+    // 借阅历史（升序）
+    async Borrow_Up() {
+      let that = this;
+      that.tableData = [];
+      await that
+        .request("Library?_sort=LastBorrowDate&_order=asc", {}, "GET", {})
+        .then((res) => {
+          that.total = res.data.length;
+          for (let i = 0; i < res.data.length; i++) {
+            let obj = {};
+            obj.index = i + 1;
+            obj.id = res.data[i].id;
+            obj.name = res.data[i].name;
+            obj.author = res.data[i].author;
+            obj.PublishHouse = res.data[i].PublishHouse;
+            obj.PublishDate = res.data[i].PublishDate;
+            obj.Isbn = res.data[i].Isbn;
+            obj.Ifborrow = res.data[i].Ifborrow;
+            obj.InDate = res.data[i].InDate;
+            obj.LastBorrowDate = res.data[i].LastBorrowDate;
+            that.tableData.push(obj);
+          }
+          this.$message({
+            message: "已升序排列",
+            type: "success",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败",
+            type: "error",
+          });
+        });
+    },
+    // 借阅历史（降序）
+    async Borrow_Down() {
+      let that = this;
+      that.tableData = [];
+      await that
+        .request("Library?_sort=LastBorrowDate&_order=desc", {}, "GET", {})
+        .then((res) => {
+          that.total = res.data.length;
+          for (let i = 0; i < res.data.length; i++) {
+            let obj = {};
+            obj.index = i + 1;
+            obj.id = res.data[i].id;
+            obj.name = res.data[i].name;
+            obj.author = res.data[i].author;
+            obj.PublishHouse = res.data[i].PublishHouse;
+            obj.PublishDate = res.data[i].PublishDate;
+            obj.Isbn = res.data[i].Isbn;
+            obj.Ifborrow = res.data[i].Ifborrow;
+            obj.InDate = res.data[i].InDate;
+            obj.LastBorrowDate = res.data[i].LastBorrowDate;
+            that.tableData.push(obj);
+          }
+          this.$message({
+            message: "已降序排列",
+            type: "success",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败",
+            type: "error",
+          });
+        });
+    },
+    // 最近入库
+    async NewInKu() {
+      let that = this;
+      that.NewIn = [];
+      await that.request("Library", {}, "GET", {}).then((res) => {
+        for (let i = 0; i < res.data.length; i++) {
+          if (
+            new Date(res.data[i].InDate).getTime() >
+            new Date("2021-12-01").getTime()
+          ) {
+            let obj = {};
+            obj.id = res.data[i].id;
+            obj.name = res.data[i].name;
+            obj.author = res.data[i].author;
+            obj.PublishHouse = res.data[i].PublishHouse;
+            obj.PublishDate = res.data[i].PublishDate;
+            obj.Isbn = res.data[i].Isbn;
+            obj.Ifborrow = res.data[i].Ifborrow;
+            obj.InDate = res.data[i].InDate;
+            obj.LastBorrowDate = res.data[i].LastBorrowDate;
+            that.NewIn.push(obj);
+          }
+        }
+      });
+      that.HandleDialog = true;
     },
   },
 };
@@ -368,20 +613,24 @@ export default {
         background-color: #409eff;
       }
     }
-
-    .refresh {
-      .el-button {
-        padding: 0 10px;
-        height: 30px;
-        border-radius: 5px;
-        font-size: 14px;
-        width: 75px;
-        border: 1px solid #409eff;
-        color: #409eff;
-      }
-
-      &:last-child {
-        margin-right: 5px;
+    .newin_refresh {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      // border: 1px solid red;
+      .refresh {
+        margin-left: 10px;
+        .el-button {
+          padding: 0 10px;
+          height: 30px;
+          border-radius: 5px;
+          font-size: 14px;
+          border: 1px solid #409eff;
+          color: #409eff;
+        }
+        // &:last-child {
+        //   margin-right: 5px;
+        // }
       }
     }
   }

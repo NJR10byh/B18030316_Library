@@ -11,7 +11,6 @@
           >
           </el-option
         ></el-select>
-
         <el-input
           placeholder="请输入需要查询的内容"
           v-model="SearchText"
@@ -132,16 +131,38 @@
       </span>
     </el-dialog>
     <el-dialog
-      class="HandleDialog"
+      class="handledialog"
       title="待处理"
       :visible.sync="HandleDialog"
-      width="30%"
+      width="60%"
     >
-      <span>待处理事项</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="HandleDialog = false">取 消</el-button>
-        <el-button type="primary" @click="HandleConfirm()">确 认</el-button>
-      </span>
+      <el-table :data="WillHandle">
+        <el-table-column prop="index" label="序号" width="60" />
+        <el-table-column prop="username" label="用户名" />
+        <el-table-column prop="name" label="姓名" />
+        <el-table-column prop="number" label="学号" />
+        <el-table-column prop="tel" label="联系方式" />
+        <el-table-column prop="email" label="电子邮件" width="160" />
+        <el-table-column
+          prop="setting"
+          label="操作"
+          width="180"
+          v-if="authorize == 'system'"
+        >
+          <template slot-scope="scope">
+            <el-button
+              @click="Pass(scope.$index, scope.row)"
+              icon="el-icon-circle-check"
+              >通过</el-button
+            >
+            <el-button
+              @click="Reject(scope.$index, scope.row)"
+              icon="el-icon-circle-close"
+              >拒绝</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
   </div>
 </template>
@@ -209,6 +230,7 @@ export default {
       HandleDialog: false,
       hidden: false,
       handlenumber: 0,
+      WillHandle: [],
     };
   },
   created() {
@@ -222,13 +244,16 @@ export default {
       that.total = 0;
       that.Select = "";
       that.SearchText = "";
+      // 获取当前登录用户id
       await that.request("Signed/", {}, "GET", {}).then((res) => {
         that.userid = res.data[0].id;
       });
+      // 获取当前登录用户权限
       let url = "Sign/" + that.userid;
       await that.request(url, {}, "GET", {}).then((res) => {
         this.authorize = res.data.authorize;
       });
+      // 获取用户列表
       await that
         .request("Sign/", {}, "GET", {})
         .then((res) => {
@@ -258,13 +283,27 @@ export default {
           });
         });
       that.currentPage = 1;
+
+      // 获取未处理数据
       await that.request("Registe/", {}, "GET", {}).then((res) => {
-        console.log(res.data);
         that.handlenumber = res.data.length;
         if (that.handlenumber != 0) {
           that.hidden = false;
         } else {
           that.hidden = true;
+        }
+        for (let i = 0; i < res.data.length; i++) {
+          let obj = {};
+          obj.index = i + 1;
+          obj.id = res.data[i].id;
+          obj.username = res.data[i].username;
+          obj.authorize = res.data[i].authorize;
+          obj.name = res.data[i].name;
+          obj.number = res.data[i].number;
+          obj.tel = res.data[i].tel;
+          obj.email = res.data[i].email;
+          obj.deadline = res.data[i].deadline;
+          that.WillHandle.push(obj);
         }
       });
     },
@@ -308,7 +347,7 @@ export default {
     async search() {
       let that = this;
       that.tableData = [];
-      let url = "Sign?" + that.Select + "=" + that.SearchText;
+      let url = "Sign?" + that.Select + "_like=" + that.SearchText;
       await that
         .request(url, {}, "GET", {})
         .then((res) => {
@@ -375,9 +414,81 @@ export default {
       that.tableData = [];
       that.total = 0;
       let url = "Sign/" + that.deleteid;
-      await that.request(url, {}, "DELETE", {});
-      this.DeletedialogVisible = false;
-      that.refresh();
+      await that
+        .request(url, {}, "DELETE", {})
+        .then(() => {
+          this.DeletedialogVisible = false;
+          that.refresh();
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败",
+            type: "error",
+          });
+        });
+    },
+
+    // 通过预处理
+    async Pass(index, row) {
+      let that = this;
+      let obj = {};
+      obj.username = row.username;
+      obj.authorize = "reader";
+      obj.name = row.name;
+      obj.number = row.number;
+      obj.tel = row.tel;
+      obj.email = row.email;
+      obj.username = row.username;
+      obj.deadline = "2022-06-30";
+      let url = "Registe/" + row.id;
+      await that
+        .request(url, {}, "DELETE", {})
+        .then(() => {
+          that
+            .request("Sign", obj, "POST", {})
+            .then(() => {
+              this.$message({
+                message: "已通过",
+                type: "success",
+              });
+              that.HandleDialog = false;
+              that.refresh();
+            })
+            .catch(() => {
+              this.$message({
+                message: "数据请求失败",
+                type: "error",
+              });
+            });
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败",
+            type: "error",
+          });
+        });
+    },
+
+    // 拒绝预处理
+    async Reject(index, row) {
+      let that = this;
+      let url = "Registe/" + row.id;
+      await that
+        .request(url, {}, "DELETE", {})
+        .then(() => {
+          this.$message({
+            message: "已拒绝",
+            type: "success",
+          });
+          that.HandleDialog = false;
+          that.refresh();
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败",
+            type: "error",
+          });
+        });
     },
   },
 };
@@ -523,6 +634,19 @@ export default {
         font-size: 17px;
         font-weight: bold;
         // color: #304156;
+      }
+    }
+  }
+  .handledialog {
+    .el-button {
+      border: none;
+      padding: 3px;
+      background: transparent;
+      &:first-child:hover {
+        color: #409eff;
+      }
+      &:nth-child(2):hover {
+        color: #f96b6c;
       }
     }
   }
