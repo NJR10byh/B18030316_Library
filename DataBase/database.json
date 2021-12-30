@@ -41,37 +41,67 @@
       "email": "1347283648@qq.com",
       "deadline": "2022-06-29",
       "id": 3
+    },
+    {
+      "username": "阿娇",
+      "authorize": "reader",
+      "name": "金灵娇",
+      "number": "B18030307",
+      "tel": "19805180000",
+      "email": "124235434@qq.com",
+      "deadline": "2022-06-30",
+      "id": 4
     }
   ],
   "Signed": [
     {
-      "id": 1
+      "id": 2
     }
   ],
   "Library": [
     {
-      "id": 5,
       "name": "哈利波特",
       "author": "J.K.罗琳",
       "PublishHouse": "人民邮电出版社",
-      "PublishDate": "2021-12-21",
-      "Isbn": "123456"
+      "PublishDate": "2021-11-01",
+      "Isbn": "2313231",
+      "Ifborrow": false,
+      "InDate": "2021-11-14",
+      "LastBorrowDate": "2021-12-29",
+      "id": 4
+    },
+    {
+      "name": "哈利波特",
+      "author": "J.K.罗琳",
+      "PublishHouse": "人民邮电出版社",
+      "PublishDate": "2021-11-02",
+      "Isbn": "123456",
+      "Ifborrow": false,
+      "InDate": "2021-12-03",
+      "LastBorrowDate": "2021-12-23",
+      "id": 5
     },
     {
       "id": 6,
       "name": "Tutu",
       "author": "J.K.罗琳",
       "PublishHouse": "人民邮电出版社",
-      "PublishDate": "2021-12-26",
-      "Isbn": "43532"
+      "PublishDate": "2021-11-23",
+      "Isbn": "43532423",
+      "Ifborrow": true,
+      "InDate": "2021-12-11",
+      "LastBorrowDate": "2021-12-28"
     },
     {
-      "id": 7,
       "name": "Baobao",
       "author": "J.K.罗琳",
       "PublishHouse": "人民邮电出版社",
-      "PublishDate": "2021-12-25",
-      "Isbn": "3423423"
+      "PublishDate": "2021-12-01",
+      "Isbn": "3423423",
+      "Ifborrow": false,
+      "InDate": "2021-12-07",
+      "LastBorrowDate": "2021-12-30",
+      "id": 7
     }
   ]
 }
