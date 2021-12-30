@@ -6,6 +6,7 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 
+
 export const constantRoutes = [
   {
     path: '/login',
@@ -48,6 +49,19 @@ export const constantRoutes = [
         name: '用户信息',
         component: () => import('@/views/user/index'),
         meta: { title: '用户信息', icon: 'user' }
+      },
+    ]
+  },
+  {
+    path: '/UserList',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/userlist',
+        name: '用户列表',
+        component: () => import('@/views/user/userlist'),
+        meta: { title: '用户列表', icon: 'form' }
       }
     ]
   },

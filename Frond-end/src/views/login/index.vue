@@ -110,6 +110,8 @@
 </template>
 
 <script>
+import GlobalData from "../../api/globaldata.js";
+
 export default {
   name: "Login",
   data() {
@@ -167,6 +169,7 @@ export default {
     };
   },
   methods: {
+    // 展示密码
     showPwd() {
       if (this.passwordType === "password") {
         this.passwordType = "";
@@ -177,6 +180,8 @@ export default {
         this.$refs.password.focus();
       });
     },
+
+    // 用户登录
     async handleLogin() {
       if (this.loginForm.userName != "" && this.loginForm.passWord != "") {
         const that = this;
@@ -190,14 +195,15 @@ export default {
                 type: "warning",
               });
             } else if (res.data[0].number == this.loginForm.passWord) {
-              this.$message({
-                message: "登录成功，Welcome！",
-                type: "success",
-              });
               let obj = {
                 id: res.data[0].id,
               };
               that.request("Signed", obj, "POST");
+              GlobalData.currentAuthorize = res.data[0].authorize;
+              this.$message({
+                message: "登录成功，Welcome！",
+                type: "success",
+              });
               this.$router.push({
                 path: "/Home",
               });
@@ -221,6 +227,8 @@ export default {
         });
       }
     },
+
+    // 用户注册
     async RegisterConfirm() {
       let that = this;
       await that.request("Registe", that.willput, "POST");

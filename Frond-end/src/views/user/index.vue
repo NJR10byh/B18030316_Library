@@ -18,7 +18,9 @@
           </div>
         </div>
         <div class="Alert">
-          <el-button @click="Alert()" icon="el-icon-edit">修改信息</el-button>
+          <el-button @click="Alert()" icon="el-icon-edit-outline"
+            >修改信息</el-button
+          >
         </div>
         <div class="InfoDetail">
           <div class="Part_1">
@@ -59,6 +61,7 @@
             <div
               class="part1_1 part1_2 Manage"
               v-if="userinfo.authorize == '系统管理员'"
+              @click="Manager()"
             >
               <div class="Info_Menu">管理用户</div>
             </div>
@@ -113,6 +116,8 @@
 </template>
 
 <script>
+import GlobalData from "../../api/globaldata";
+
 export default {
   data() {
     return {
@@ -210,6 +215,13 @@ export default {
       await that.request(url, that.willput, "PUT", {});
       that.AlertdialogVisible = false;
       that.refresh();
+    },
+
+    // 管理用户
+    Manager() {
+      this.$router.push({
+        path: "/userlist",
+      });
     },
   },
 };

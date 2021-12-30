@@ -47,7 +47,7 @@
         <template slot-scope="scope">
           <el-button
             @click="handleEdit(scope.$index, scope.row)"
-            icon="el-icon-edit"
+            icon="el-icon-edit-outline"
             >修改</el-button
           >
           <el-button
@@ -237,10 +237,12 @@ export default {
           for (let i = 0; i < res.data.data.length; i++) {
             let obj = {};
             obj.index = i + 1;
-            obj.id = res.data.data[i].id;
-            obj.name = res.data.data[i].name;
-            obj.score = res.data.data[i].score;
-            obj.counter = res.data.data[i].counter;
+            obj.id = res.data[i].id;
+            obj.name = res.data[i].name;
+            obj.author = res.data[i].author;
+            obj.PublishHouse = res.data[i].PublishHouse;
+            obj.PublishDate = res.data[i].PublishDate;
+            obj.Isbn = res.data[i].Isbn;
             that.tableData.push(obj);
           }
           this.$message({
