@@ -55,20 +55,20 @@
   ],
   "Signed": [
     {
-      "id": 2
+      "id": 4
     }
   ],
   "Library": [
     {
+      "id": 4,
       "name": "哈利波特",
       "author": "J.K.罗琳",
-      "PublishHouse": "人民邮电出版社",
+      "PublishHouse": "人民邮电",
       "PublishDate": "2021-11-01",
       "Isbn": "2313231",
       "Ifborrow": false,
       "InDate": "2021-11-14",
-      "LastBorrowDate": "2021-12-29",
-      "id": 4
+      "LastBorrowDate": "2021-12-29"
     },
     {
       "name": "哈利波特",
@@ -76,7 +76,7 @@
       "PublishHouse": "人民邮电出版社",
       "PublishDate": "2021-11-02",
       "Isbn": "123456",
-      "Ifborrow": false,
+      "Ifborrow": true,
       "InDate": "2021-12-03",
       "LastBorrowDate": "2021-12-23",
       "id": 5
@@ -102,6 +102,17 @@
       "InDate": "2021-12-07",
       "LastBorrowDate": "2021-12-30",
       "id": 7
+    },
+    {
+      "name": "AAA",
+      "author": "BBB",
+      "PublishHouse": "CCC",
+      "PublishDate": "2021-10-25",
+      "Isbn": "341242314",
+      "Ifborrow": false,
+      "InDate": "2021-12-21",
+      "LastBorrowDate": "2021-12-31",
+      "id": 8
     }
   ]
 }
