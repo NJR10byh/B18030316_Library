@@ -167,6 +167,7 @@ export default {
           that.userinfo.tel = res.data.tel;
           that.userinfo.email = res.data.email;
           that.userinfo.deadline = res.data.deadline;
+          console.log(res.data.authorize);
           switch (res.data.authorize) {
             case "system":
               that.userinfo.authorize = "系统管理员";

@@ -13,14 +13,14 @@
   ],
   "Sign": [
     {
-      "id": 1,
-      "username": "Tutu",
+      "username": "NJR10byh",
       "authorize": "system",
-      "name": "涂鑫曼",
-      "number": "B18030309",
-      "tel": "19805182522",
+      "name": "NJR10byh",
+      "number": "0000001",
+      "tel": "123456789",
       "email": "123456789@qq.com",
-      "deadline": "2022-06-26"
+      "deadline": "2022-06-26",
+      "id": 1
     },
     {
       "id": 2,
