@@ -20,13 +20,18 @@
       </div>
       <div class="newin_refresh">
         <div class="refresh up" v-if="authorize == 'book'">
+          <el-button icon="el-icon-notebook-1" @click="AddDialogVisible = true"
+            >新增图书
+          </el-button>
+        </div>
+        <div class="refresh up" v-if="authorize == 'book'">
           <el-button icon="el-icon-top" @click="Borrow_Up()"
-            >最后借阅时间（升序）
+            >最后借阅
           </el-button>
         </div>
         <div class="refresh down" v-if="authorize == 'book'">
           <el-button icon="el-icon-bottom" @click="Borrow_Down()"
-            >最后借阅时间（降序）
+            >最后借阅
           </el-button>
         </div>
         <div class="refresh newin" v-if="authorize == 'book'">
@@ -184,6 +189,57 @@
         >
       </span>
     </el-dialog>
+
+    <el-dialog
+      class="Putdialog"
+      title="新增图书"
+      :visible.sync="AddDialogVisible"
+      width="30%"
+    >
+      <div>
+        <span>书籍名称：</span
+        ><el-input
+          v-model="willadd.name"
+          placeholder="请输入书籍名称"
+        ></el-input>
+      </div>
+      <div>
+        <span>作者：</span
+        ><el-input v-model="willadd.author" placeholder="请输入作者"></el-input>
+      </div>
+      <div>
+        <span>出版社：</span
+        ><el-input
+          v-model="willadd.PublishHouse"
+          placeholder="请输入出版社"
+        ></el-input>
+      </div>
+      <div>
+        <span>出版日期：</span
+        ><el-input
+          v-model="willadd.PublishDate"
+          placeholder="请输入出版日期"
+        ></el-input>
+      </div>
+      <div>
+        <span>ISBN（书号）：</span
+        ><el-input
+          v-model="willadd.Isbn"
+          placeholder="请输入ISBN（书号）"
+        ></el-input>
+      </div>
+      <div>
+        <span>入库日期：</span
+        ><el-input
+          v-model="willadd.InDate"
+          placeholder="请输入入库日期"
+        ></el-input>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="AddDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="AddConfirm()">新 增</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -245,6 +301,19 @@ export default {
       // 最近入库
       HandleDialog: false,
       NewIn: [],
+
+      // 新增图书
+      AddDialogVisible: false,
+      willadd: {
+        name: "",
+        author: "",
+        PublishHouse: "",
+        PublishDate: "",
+        Isbn: "",
+        Ifborrow: "",
+        InDate: "",
+        LastBorrowDate: "",
+      },
     };
   },
   created() {
@@ -413,6 +482,26 @@ export default {
         .request(url, {}, "DELETE", {})
         .then(() => {
           this.DeletedialogVisible = false;
+          that.refresh();
+        })
+        .catch(() => {
+          this.$message({
+            message: "数据请求失败",
+            type: "error",
+          });
+        });
+    },
+
+    // 新增图书
+    async AddConfirm() {
+      let that = this;
+      that.willadd.Ifborrow = false;
+      that.willadd.LastBorrowDate = "2021-12-31";
+      console.log(that.willadd);
+      await that
+        .request("Library", that.willadd, "POST", {})
+        .then(() => {
+          that.AddDialogVisible = false;
           that.refresh();
         })
         .catch(() => {

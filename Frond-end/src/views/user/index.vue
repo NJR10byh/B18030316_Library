@@ -116,8 +116,6 @@
 </template>
 
 <script>
-import GlobalData from "../../api/globaldata";
-
 export default {
   data() {
     return {

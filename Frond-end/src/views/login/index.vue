@@ -110,8 +110,6 @@
 </template>
 
 <script>
-import GlobalData from "../../api/globaldata.js";
-
 export default {
   name: "Login",
   data() {
@@ -199,7 +197,6 @@ export default {
                 id: res.data[0].id,
               };
               that.request("Signed", obj, "POST");
-              GlobalData.currentAuthorize = res.data[0].authorize;
               this.$message({
                 message: "登录成功，Welcome！",
                 type: "success",
